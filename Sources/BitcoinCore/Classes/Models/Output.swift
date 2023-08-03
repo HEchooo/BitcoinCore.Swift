@@ -83,7 +83,7 @@ public class Output: Record {
         case failedToSpend
     }
 
-    required init(row: Row) {
+    required init(row: Row) throws {
         value = row[Columns.value]
         lockingScript = row[Columns.lockingScript]
         index = row[Columns.index]
@@ -98,7 +98,7 @@ public class Output: Record {
         pluginData = row[Columns.pluginData]
         failedToSpend = row[Columns.failedToSpend]
 
-        super.init(row: row)
+        try super.init(row: row)
     }
 
     override open func encode(to container: inout PersistenceContainer) {

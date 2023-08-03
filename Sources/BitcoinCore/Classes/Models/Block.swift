@@ -51,7 +51,7 @@ public class Block: Record {
         case partial
     }
 
-    required init(row: Row) {
+    required init(row: Row) throws {
         version = row[Columns.version]
         previousBlockHash = row[Columns.previousBlockHash]
         merkleRoot = row[Columns.merkleRoot]
@@ -64,7 +64,7 @@ public class Block: Record {
         hasTransactions = row[Columns.hasTransactions]
         partial = row[Columns.partial]
 
-        super.init(row: row)
+        try super.init(row: row)
     }
 
     override open func encode(to container: inout PersistenceContainer) {

@@ -32,13 +32,13 @@ public class SentTransaction: Record {
         case sendSuccess
     }
 
-    required init(row: Row) {
+    required init(row: Row) throws {
         dataHash = row[Columns.dataHash]
         lastSendTime = row[Columns.lastSendTime]
         retriesCount = row[Columns.retriesCount]
         sendSuccess = row[Columns.sendSuccess]
 
-        super.init(row: row)
+        try super.init(row: row)
     }
 
     override open func encode(to container: inout PersistenceContainer) {

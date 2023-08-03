@@ -37,12 +37,12 @@ public class BlockHash: Record {
         case sequence
     }
 
-    required init(row: Row) {
+    required init(row: Row) throws {
         headerHash = row[Columns.headerHash]
         height = row[Columns.height]
         sequence = row[Columns.sequence]
 
-        super.init(row: row)
+        try super.init(row: row)
     }
 
     override open func encode(to container: inout PersistenceContainer) {

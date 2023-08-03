@@ -45,13 +45,13 @@ public class TransactionMetadata: Record {
         case fee
     }
     
-    required init(row: Row) {
+    required init(row: Row) throws {
         transactionHash = row[Columns.transactionHash]
         amount = row[Columns.amount]
         type = row[Columns.type]
         fee = row[Columns.fee]
 
-        super.init(row: row)
+        try super.init(row: row)
     }
     
     override open func encode(to container: inout PersistenceContainer) {
