@@ -3,7 +3,7 @@ import GRDB
 
 open class GrdbStorage {
     public var dbqueue: DatabaseQueue
-    static let shared = GrdbStorage()
+    public static let shared = GrdbStorage()
 
     public init(databaseFilePath: String) {
         dbqueue = try! DatabaseQueue(path: databaseFilePath)
