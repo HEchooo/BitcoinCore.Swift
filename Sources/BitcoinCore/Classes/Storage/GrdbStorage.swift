@@ -3,10 +3,18 @@ import GRDB
 
 open class GrdbStorage {
     public var dbqueue: DatabaseQueue
+    static let shared = GrdbStorage()
 
     public init(databaseFilePath: String) {
         dbqueue = try! DatabaseQueue(path: databaseFilePath)
+        
 
+        try? migrator.migrate(dbqueue)
+    }
+    
+    public init() {
+        let databaseFilePath = try! DirectoryHelper.directoryURL(for: "BitcoinKit").appendingPathComponent("echooo-bitcoin").path
+        dbqueue = try! DatabaseQueue(path: databaseFilePath)
         try? migrator.migrate(dbqueue)
     }
 
