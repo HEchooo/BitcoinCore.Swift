@@ -16,7 +16,7 @@ public class BitcoinCoreBuilder {
     private var walletId: String?
     private var initialSyncApi: ISyncTransactionApi?
     private var plugins = [IPlugin]()
-    private var logger: Logger
+    private var logger: Logger?
 
     private var blockHeaderHasher: IHasher?
     private var blockValidator: IBlockValidator?
@@ -104,7 +104,7 @@ public class BitcoinCoreBuilder {
         return self
     }
 
-    public init(logger: Logger) {
+    public init(logger: Logger?) {
         self.logger = logger
     }
 
