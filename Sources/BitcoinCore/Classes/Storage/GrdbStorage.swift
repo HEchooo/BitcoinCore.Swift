@@ -3,12 +3,12 @@ import HsToolKit
 import GRDB
 
 open class GrdbStorage {
-    public var dbPool: DatabasePool
-    public static let shared = GrdbStorage()
+    public let dbPool: DatabasePool
+//    public static let shared = GrdbStorage()
     private var logger: Logger
     
-    public init() {
-        let databaseFilePath = try! DirectoryHelper.directoryURL(for: "BitcoinKit").appendingPathComponent("echooo-bitcoin").path
+    public init(databaseFilePath: String) {
+//        let databaseFilePath = try! DirectoryHelper.directoryURL(for: "BitcoinKit").appendingPathComponent("echooo-bitcoin").path
         dbPool = try! DatabasePool(path: databaseFilePath)
         logger = Logger(minLogLevel: .verbose).scoped(with: "EchooWallet-Bitcoin")
         do {
