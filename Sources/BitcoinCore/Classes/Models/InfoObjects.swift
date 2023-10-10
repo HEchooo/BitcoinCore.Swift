@@ -77,6 +77,7 @@ public struct BlockInfo {
 public struct BalanceInfo : Equatable {
     public let spendable: Int
     public let unspendable: Int
+    public let waitConfirmedSpendable: Int
 
     public static func ==(lhs: BalanceInfo, rhs: BalanceInfo) -> Bool {
         lhs.spendable == rhs.spendable && lhs.unspendable == rhs.unspendable
