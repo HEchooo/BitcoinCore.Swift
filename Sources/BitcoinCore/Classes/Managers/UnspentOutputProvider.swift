@@ -61,20 +61,15 @@ extension UnspentOutputProvider: IUnspentOutputProvider {
     var spendableUtxo: [UnspentOutput] {
         confirmedUtxo.filter { pluginManager.isSpendable(unspentOutput: $0) }
     }
-    var waitConfirmedUtxo: [UnspentOutput] {
-        let res = confirmedUxtxInBlock()
-        return res
-    }
 }
 
 extension UnspentOutputProvider: IBalanceProvider {
 
     var balanceInfo: BalanceInfo {
         let spendable =  spendableUtxo.map { $0.output.value }.reduce(0, +)
-        let waitConfirmedSpendable = spendable - waitConfirmedUtxo.map { $0.output.value }.reduce(0, +)
         let unspendable = unspendableUtxo.map { $0.output.value }.reduce(0, +)
 
-        return BalanceInfo(spendable: spendable, unspendable: unspendable, waitConfirmedSpendable: waitConfirmedSpendable)
+        return BalanceInfo(spendable: spendable, unspendable: unspendable)
     }
 
 }
