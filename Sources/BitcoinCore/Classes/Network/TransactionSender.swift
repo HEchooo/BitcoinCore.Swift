@@ -3,6 +3,10 @@ import Combine
 import QuartzCore
 import HsToolKit
 
+internal extension NSNotification.Name {
+    static let transactionSendStartNotification = NSNotification.Name("BtcTransactionSendStartNotification")
+}
+
 class TransactionSender {
     static let minConnectedPeersCount = 2
 
@@ -93,6 +97,7 @@ class TransactionSender {
         } else {
             storage.add(sentTransaction: SentTransaction(dataHash: transaction.header.dataHash))
         }
+        NotificationCenter.default.post(name: .transactionSendStartNotification, object: nil)
     }
 
     private func send(transactions: [FullTransaction]) {

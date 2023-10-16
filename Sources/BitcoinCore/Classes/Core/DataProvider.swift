@@ -39,6 +39,7 @@ class DataProvider {
                     self?.balance = balanceProvider.balanceInfo
                 }
                 .store(in: &cancellables)
+        NotificationCenter.default.addObserver(self, selector: #selector(transactionSendStartThenUpdateBalance), name: .transactionSendStartNotification, object: nil)
     }
 
     private func blockInfo(fromBlock block: Block) -> BlockInfo {
@@ -47,6 +48,10 @@ class DataProvider {
                 height: block.height,
                 timestamp: block.timestamp
         )
+    }
+    
+    @objc private func transactionSendStartThenUpdateBalance() {
+        balanceUpdateSubject.send()
     }
 
 }
