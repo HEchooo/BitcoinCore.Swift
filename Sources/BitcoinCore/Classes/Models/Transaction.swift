@@ -71,7 +71,7 @@ public class Transaction: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.uid] = uid
         container[Columns.dataHash] = dataHash
         container[Columns.version] = version

@@ -26,7 +26,7 @@ class BlockchainState: Record {
         try super.init(row: row)
     }
 
-    override func encode(to container: inout PersistenceContainer) {
+    override func encode(to container: inout PersistenceContainer) throws {
         container[Columns.primaryKey] = primaryKey
         container[Columns.initialRestored] = initialRestored
     }

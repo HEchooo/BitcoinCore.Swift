@@ -18,7 +18,6 @@ public enum TransactionFilterType {
     }
 }
 
-
 public class TransactionMetadata: Record {
     public var transactionHash: Data
     public var amount: Int
@@ -37,14 +36,13 @@ public class TransactionMetadata: Record {
     override open class var databaseTableName: String {
         "transaction_metadata"
     }
-    
+
     enum Columns: String, ColumnExpression, CaseIterable {
         case transactionHash
         case amount
         case type
         case fee
     }
-    
     required init(row: Row) throws {
         transactionHash = row[Columns.transactionHash]
         amount = row[Columns.amount]
@@ -53,12 +51,12 @@ public class TransactionMetadata: Record {
 
         try super.init(row: row)
     }
-    
-    override open func encode(to container: inout PersistenceContainer) {
+
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.transactionHash] = transactionHash
         container[Columns.amount] = amount
         container[Columns.type] = type
         container[Columns.fee] = fee
     }
-    
+
 }

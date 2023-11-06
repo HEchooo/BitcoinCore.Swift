@@ -59,7 +59,7 @@ public class PublicKey: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.path] = path
         container[Columns.account] = account
         container[Columns.index] = index
@@ -70,4 +70,18 @@ public class PublicKey: Record {
         container[Columns.convertedForP2tr] = convertedForP2tr
     }
 
+}
+
+extension PublicKey: Hashable {
+    public static func == (lhs: PublicKey, rhs: PublicKey) -> Bool {
+        lhs.path == rhs.path
+    }
+
+    public var hashValue: Int {
+        path.hashValue
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(path)
+    }
 }

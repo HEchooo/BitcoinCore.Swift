@@ -50,7 +50,7 @@ public class Input: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.previousOutputTxHash] = previousOutputTxHash
         container[Columns.previousOutputIndex] = previousOutputIndex
         container[Columns.signatureScript] = signatureScript

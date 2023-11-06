@@ -30,7 +30,7 @@ public class PeerAddress: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.ip] = ip
         container[Columns.score] = score
         container[Columns.connectionTime] = connectionTime

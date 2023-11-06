@@ -45,7 +45,7 @@ public class BlockHash: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.headerHash] = headerHash
         container[Columns.height] = height
         container[Columns.sequence] = sequence

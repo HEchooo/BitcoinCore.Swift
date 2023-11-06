@@ -101,7 +101,7 @@ public class Output: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.value] = value
         container[Columns.lockingScript] = lockingScript
         container[Columns.index] = index

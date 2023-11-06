@@ -67,7 +67,7 @@ public class Block: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.version] = version
         container[Columns.previousBlockHash] = previousBlockHash
         container[Columns.merkleRoot] = merkleRoot

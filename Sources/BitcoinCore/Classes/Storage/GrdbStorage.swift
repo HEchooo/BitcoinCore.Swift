@@ -4,11 +4,10 @@ import GRDB
 
 open class GrdbStorage {
     public let dbPool: DatabasePool
-//    public static let shared = GrdbStorage()
+    
     private var logger: Logger
     
     public init(databaseFilePath: String) {
-//        let databaseFilePath = try! DirectoryHelper.directoryURL(for: "BitcoinKit").appendingPathComponent("echooo-bitcoin").path
         dbPool = try! DatabasePool(path: databaseFilePath)
         logger = Logger(minLogLevel: .verbose).scoped(with: "EchooWallet-Bitcoin")
         do {
@@ -325,6 +324,17 @@ open class GrdbStorage {
             }
         }
         
+        migrator.registerMigration("createBlockHashPublicKeys") { db in
+            try db.create(table: BlockHashPublicKey.databaseTableName) { t in
+                t.column(BlockHashPublicKey.Columns.blockHash.name, .text).notNull()
+                t.column(BlockHashPublicKey.Columns.publicKeyPath.name, .integer).notNull()
+                
+                t.primaryKey([BlockHashPublicKey.Columns.blockHash.name, BlockHashPublicKey.Columns.publicKeyPath.name], onConflict: .ignore)
+                t.foreignKey([BlockHashPublicKey.Columns.blockHash.name], references: BlockHash.databaseTableName, columns: [BlockHash.Columns.headerHash.name], onDelete: .cascade)
+                t.foreignKey([BlockHashPublicKey.Columns.publicKeyPath.name], references: PublicKey.databaseTableName, columns: [PublicKey.Columns.path.name], onDelete: .cascade)
+            }
+        }
+        
         return migrator
     }
     
@@ -577,6 +587,29 @@ extension GrdbStorage: IStorage {
         }
     }
     
+    public func add(blockHashes: [BlockHash]) {
+        do {
+            _ = try dbPool.write { db in
+                for blockHash in blockHashes {
+                    try blockHash.insert(db)
+                }
+            }
+        } catch {
+            logger.log(level: .error, message: "\(#function), \(error)")
+        }
+    }
+    
+    public var blockHashPublicKeys: [BlockHashPublicKey] {
+        do {
+            return try dbPool.read { db in
+                try BlockHashPublicKey.fetchAll(db)
+            }
+        } catch {
+            logger.log(level: .error, message: "\(#function), \(error)")
+            return []
+        }
+    }
+    
     public func blockHashHeaderHashes(except excludedHashes: [Data]) -> [Data] {
         do {
             return try dbPool.read { db in
@@ -609,11 +642,11 @@ extension GrdbStorage: IStorage {
         }
     }
     
-    public func add(blockHashes: [BlockHash]) {
+    public func add(blockHashPublicKeys: [BlockHashPublicKey]) {
         do {
             _ = try dbPool.write { db in
-                for blockHash in blockHashes {
-                    try blockHash.insert(db)
+                for entity in blockHashPublicKeys {
+                    try entity.insert(db)
                 }
             }
         } catch {
@@ -874,6 +907,20 @@ extension GrdbStorage: IStorage {
     }
     
     // Transaction
+    public var downloadedTransactionsBestBlockHeight: Int {
+        try! dbPool.read { db in
+            let maxDownloadedHeight = try Block
+                .filter(Block.Columns.height != nil && Block.Columns.hasTransactions)
+                .order(Block.Columns.height.desc)
+                .fetchOne(db)?.height ?? 0
+            let maxDiscoveredHeight = try BlockHash
+                .order(BlockHash.Columns.height.desc)
+                .fetchOne(db)?.height ?? 0
+            
+            return max(maxDownloadedHeight, maxDiscoveredHeight)
+        }
+    }
+    
     public func fullTransaction(byHash hash: Data) -> FullTransaction? {
         do {
             return try dbPool.read { db in
@@ -1446,7 +1493,7 @@ extension GrdbStorage: IStorage {
     
     public func publicKeysWithUsedState() -> [PublicKeyWithUsedState] {
         do {
-            return try dbPool.read { db in
+            let res = try dbPool.read { db in
                 let publicKeyC = PublicKey.Columns.allCases.count
                 
                 let adapter = ScopeAdapter([
@@ -1454,20 +1501,21 @@ extension GrdbStorage: IStorage {
                 ])
                 
                 let sql = """
-                          SELECT publicKeys.*, outputs.transactionHash
-                          FROM publicKeys
-                          LEFT JOIN outputs ON publicKeys.path = outputs.publicKeyPath
-                          GROUP BY publicKeys.path
-                          """
+                      SELECT publicKeys.*, outputs.transactionHash AS outputTxHash, blockHashPublicKeys.blockHash AS blockHash
+                      FROM publicKeys
+                      LEFT JOIN outputs ON publicKeys.path = outputs.publicKeyPath
+                      LEFT JOIN blockHashPublicKeys ON publicKeys.path = blockHashPublicKeys.publicKeyPath
+                      GROUP BY publicKeys.path
+                      """
                 
                 let rows = try Row.fetchCursor(db, sql: sql, adapter: adapter)
                 var publicKeys = [PublicKeyWithUsedState]()
                 while let row = try rows.next() {
-                    publicKeys.append(PublicKeyWithUsedState(publicKey: row["publicKey"], used: row["transactionHash"] != nil))
+                    publicKeys.append(PublicKeyWithUsedState(publicKey: row["publicKey"], used: row["outputTxHash"] != nil || row["blockHash"] != nil))
                 }
-                
                 return publicKeys
             }
+            return res
         } catch {
             logger.log(level: .error, message: "\(#function), \(error)")
             return []

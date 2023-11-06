@@ -41,7 +41,7 @@ public class SentTransaction: Record {
         try super.init(row: row)
     }
 
-    override open func encode(to container: inout PersistenceContainer) {
+    override open func encode(to container: inout PersistenceContainer) throws {
         container[Columns.dataHash] = dataHash
         container[Columns.lastSendTime] = lastSendTime
         container[Columns.retriesCount] = retriesCount
