@@ -2,19 +2,22 @@ import Foundation
 
 public class DirectoryHelper {
 
-    public static func directoryURL(for directoryName: String) throws -> URL {
+    public static func directoryURL(for directoryName: String, address: String = "") throws -> URL {
         let fileManager = FileManager.default
 
-        let url = try fileManager
+        var url = try fileManager
                 .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 .appendingPathComponent(directoryName, isDirectory: true)
+        if !address.isEmpty {
+            url = url.appendingPathComponent(address, isDirectory: true)
+        }
 
         try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
 
         return url
     }
 
-    public static func removeDirectory(_ name: String) throws {
+    public static func removeDirectory(_ name: String, address: String) throws {
         try FileManager.default.removeItem(at: directoryURL(for: name))
     }
 
