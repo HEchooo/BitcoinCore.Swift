@@ -2,15 +2,15 @@ import Foundation
 
 public class DirectoryHelper {
 
-    public static func directoryURL(for directoryName: String, address: String = "") throws -> URL {
+    public static func directoryURL(for directoryName: String) throws -> URL {
         let fileManager = FileManager.default
 
         var url = try fileManager
                 .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
                 .appendingPathComponent(directoryName, isDirectory: true)
-        if !address.isEmpty {
-            url = url.appendingPathComponent(address, isDirectory: true)
-        }
+//        if !address.isEmpty {
+//            url = url.appendingPathComponent(address, isDirectory: true)
+//        }
 
         try fileManager.createDirectory(at: url, withIntermediateDirectories: true)
 
